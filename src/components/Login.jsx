@@ -9,8 +9,8 @@ import { Link } from 'react-router-dom'
 
 function Login() {
   const [form, setForm] = useState({
-    login_nome: '',
-    login_senha: ''
+    email: '',
+    password: ''
   })
 
   const [formAlert, setFormAlert] = useState({
@@ -45,9 +45,9 @@ function Login() {
 
   function handleSubmit(event) {
     event.preventDefault()
-    const { login_nome, login_senha } = form
+    const { email, password } = form
     // No empty fields
-    if (login_nome == '' || login_senha == '') {
+    if (email == '' || password == '') {
       showFormAlert('Há campos em branco')
       return
     }
@@ -60,24 +60,24 @@ function Login() {
         <h2>Login</h2>
         <Form>
             { formAlert.active && <Alert variant={formAlert.variant}>{formAlert.message}</Alert>}
-            <FormGroup className='mb-3' controlId="login_nome">
-                <FormLabel>Nome de usuário: </FormLabel>
+            <FormGroup className='mb-3' controlId="email">
+                <FormLabel>Email da sua conta: </FormLabel>
                 <FormControl 
-                  type="text" 
-                  placeholder="Seu nome de usuário" 
+                  type="email" 
+                  placeholder="Seu email" 
                   onChange={e => handleChange(e)}
-                  name="login_nome"
-                  value={form.login_nome}
+                  name="email"
+                  value={form.email}
                 />
             </FormGroup>
-            <FormGroup className='mb-3' controlId="login_senha">
+            <FormGroup className='mb-3' controlId="password">
                 <FormLabel>Senha: </FormLabel>
                 <FormControl 
                   type="password" 
                   placeholder="Sua senha" 
                   onChange={e => handleChange(e)}
-                  name="login_senha"
-                  value={form.login_senha}
+                  name="password"
+                  value={form.password}
                 />
             </FormGroup>
             <Button variant="primary" type="submit" onClick={e => handleSubmit(e)}>Logar</Button>

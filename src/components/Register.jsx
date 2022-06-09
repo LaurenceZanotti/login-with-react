@@ -9,9 +9,10 @@ import Alert from 'react-bootstrap/Alert'
 
 function Register() {
     const [form, setForm] = useState({
-        register_username: '',
-        register_password: '',
-        register_confirmation: ''
+        email: '',
+        name: '',
+        password: '',
+        password2: ''
     })
 
     const [formAlert, setFormAlert] = useState({
@@ -48,22 +49,54 @@ function Register() {
 
     function handleSubmit(event) {
         event.preventDefault()
-        const {register_username, register_password, register_confirmation} = form
+        const {email, name, password, password2} = form
+        console.log(name);
 
         // No empty fields
-        if (register_confirmation == '' || register_password == '' || register_username == '') {
+        if (email == '' || password2 == '' || password == '' || name == '') {
             showFormAlert('Há campos em branco')
             return
         }
 
         // Check if password confirmation is valid
-        if (register_password != register_confirmation) { 
-            showFormAlert('Senha não conferem')
+        if (password != password2) { 
+            showFormAlert('Senhas não conferem')
             return
         }
-
+        
         // Send account details to API (TODO)
-        console.log(form);
+        let status_code = 0
+        const register_endpoint = '/api/auth/register'
+        fetch(`http://localhost:5000${register_endpoint}`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "name": name,
+                "email": email,
+                "password": password,
+                "password2": password2
+            })
+        })
+            .then(res => {
+                status_code = res.status
+                return res.json()                
+            })
+            .then(data => {
+                console.log(data)
+                if (status_code = 400) {
+                    showFormAlert(`${data.auth}`, 'warning')
+                    return
+                }
+                showFormAlert(`Seja bem vindo ${form.name}!`, 'success')
+            })
+            .catch(err => {
+                console.error(err)
+                showFormAlert('Algo deu errado')
+            })
     }
 
     return (
@@ -71,34 +104,44 @@ function Register() {
             <h2>Registrar</h2>
             <Form>
                 { formAlert.active && <Alert variant={formAlert.variant}>{formAlert.message}</Alert>}
-                <FormGroup className='mb-3' controlId="register_username">
+                <FormGroup className='mb-3' controlId="email">
+                    <FormLabel>Seu melhor e-mail: </FormLabel>
+                    <FormControl 
+                        type="email" 
+                        placeholder="Seu e-mail" 
+                        onChange={e => handleChange(e)} 
+                        name="email" 
+                        value={form.email} 
+                    />
+                </FormGroup>
+                <FormGroup className='mb-3' controlId="name">
                     <FormLabel>Nome de usuário: </FormLabel>
                     <FormControl 
                         type="text" 
                         placeholder="Seu nome de usuário" 
                         onChange={e => handleChange(e)} 
-                        name="register_username" 
-                        value={form.register_username} 
+                        name="name" 
+                        value={form.name} 
                     />
                 </FormGroup>
-                <FormGroup className='mb-3' controlId="register_password">
+                <FormGroup className='mb-3' controlId="password">
                     <FormLabel>Senha: </FormLabel>
                     <FormControl 
                         type="password" 
                         placeholder="Sua senha" 
                         onChange={e => handleChange(e)} 
-                        name="register_password" 
-                        value={form.register_password} 
+                        name="password" 
+                        value={form.password} 
                     />
                 </FormGroup>
-                <FormGroup className='mb-3' controlId="register_confirmation">
+                <FormGroup className='mb-3' controlId="password2">
                     <FormLabel>Confirme sua senha: </FormLabel>
                     <FormControl 
                         type="password" 
                         placeholder="Sua senha" 
                         onChange={e => handleChange(e)} 
-                        name="register_confirmation" 
-                        value={form.register_confirmation} 
+                        name="password2" 
+                        value={form.password2} 
                     />
                 </FormGroup>
                 <Button variant="primary" type="submit" onClick={e => handleSubmit(e)}>Registrar</Button>
