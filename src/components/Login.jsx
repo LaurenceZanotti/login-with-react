@@ -4,6 +4,7 @@ import Form from 'react-bootstrap/Form'
 import FormGroup from 'react-bootstrap/FormGroup'
 import FormLabel from 'react-bootstrap/FormLabel'
 import FormControl from 'react-bootstrap/FormControl'
+import Alert from 'react-bootstrap/Alert'
 import { Link } from 'react-router-dom'
 
 function Login() {
@@ -11,6 +12,26 @@ function Login() {
     login_nome: '',
     login_senha: ''
   })
+
+  const [formAlert, setFormAlert] = useState({
+    message: 'There is no message',
+    variant: 'danger',
+    active: false
+  })
+
+  function showFormAlert(message, variant="danger") {
+    setFormAlert({
+        message: message,
+        variant: variant,
+        active: true
+    })
+    setTimeout(() => setFormAlert(prevState => {
+        return {
+            ...prevState,
+            active: false
+        }
+    }), 5000)
+  }
 
   function handleChange(event) {
     const target = event.target
@@ -24,6 +45,12 @@ function Login() {
 
   function handleSubmit(event) {
     event.preventDefault()
+    const { login_nome, login_senha } = form
+    // No empty fields
+    if (login_nome == '' || login_senha == '') {
+      showFormAlert('Há campos em branco')
+      return
+    }
     // Send to API (TODO)
     console.log(form)
   }
@@ -32,6 +59,7 @@ function Login() {
     <div className='p-3'>
         <h2>Login</h2>
         <Form>
+            { formAlert.active && <Alert variant={formAlert.variant}>{formAlert.message}</Alert>}
             <FormGroup className='mb-3' controlId="login_nome">
                 <FormLabel>Nome de usuário: </FormLabel>
                 <FormControl 

@@ -5,6 +5,7 @@ import FormGroup from 'react-bootstrap/FormGroup'
 import FormLabel from 'react-bootstrap/FormLabel'
 import FormControl from 'react-bootstrap/FormControl'
 import Button from 'react-bootstrap/Button'
+import Alert from 'react-bootstrap/Alert'
 
 function Register() {
     const [form, setForm] = useState({
@@ -13,10 +14,30 @@ function Register() {
         register_confirmation: ''
     })
 
+    const [formAlert, setFormAlert] = useState({
+        message: 'There is no message',
+        variant: 'danger',
+        active: false
+    })
+
+    const [isLoading, setIsLoading] = useState(false)
+
+    function showFormAlert(message, variant="danger") {
+        setFormAlert({
+            message: message,
+            variant: variant,
+            active: true
+        })
+        setTimeout(() => setFormAlert(prevState => {
+            return {
+                ...prevState,
+                active: false
+            }
+        }), 5000)
+    }
     function handleChange(event) {
         // Bind form
         const target = event.target
-        console.log(target.name, target.value);
         setForm(prevState => {
             return {
                 ...prevState,
@@ -27,10 +48,19 @@ function Register() {
 
     function handleSubmit(event) {
         event.preventDefault()
+        const {register_username, register_password, register_confirmation} = form
+
+        // No empty fields
+        if (register_confirmation == '' || register_password == '' || register_username == '') {
+            showFormAlert('Há campos em branco')
+            return
+        }
 
         // Check if password confirmation is valid
-        if (form.register_password != form.register_confirmation) console.log('Passwords don\'t match')
-        else console.log('Passwords match')
+        if (register_password != register_confirmation) { 
+            showFormAlert('Senha não conferem')
+            return
+        }
 
         // Send account details to API (TODO)
         console.log(form);
@@ -40,6 +70,7 @@ function Register() {
         <div className='p-3'>
             <h2>Registrar</h2>
             <Form>
+                { formAlert.active && <Alert variant={formAlert.variant}>{formAlert.message}</Alert>}
                 <FormGroup className='mb-3' controlId="register_username">
                     <FormLabel>Nome de usuário: </FormLabel>
                     <FormControl 
